@@ -16,10 +16,12 @@
 <script>
     let ele = document.querySelector('div')
     let vue = new Mvvm({
-        name: 'must be success!!!'
+        name: 'must be success!!!',
+        oo: 'we'
     }, ele, 'name')
 
     vue.init()
+
     window.setTimeout(() => {
         console.log('change');
         vue.vm.name = '我很好阿'
