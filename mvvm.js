@@ -1,6 +1,5 @@
 //数据劫持demo
 
-//解耦
 class Dep { //消息订阅器
     constructor() {
         this.subs = []
@@ -18,7 +17,7 @@ class Dep { //消息订阅器
 //全局属性，配置watcher
 Dep.target = null
 
-class Watcher {
+class Watcher { //观察者
     constructor(vm, exp, cb) {
         this.cb = cb
         this.exp = exp
@@ -46,20 +45,36 @@ class Watcher {
 
 //compile
 class Mvvm {
-    constructor(vm, el, exp) {
-        this.vm = vm
+    constructor(data, el, exp) {
+        this.data = data
         this.el = el
         this.exp = exp
     }
     init() {
         let _self = this
-        observe(_self.vm)
+        Object.keys(this.data).forEach(function(key) {
+            _self.proxyKeys(key); // 绑定代理属性
+        })
+        observe(_self.data)
 
-        _self.el.innerHTML = _self.vm[_self.exp]
-        new Watcher(this.vm, _self.exp, val => {
+        _self.el.innerHTML = _self.data[_self.exp]
+        new Watcher(this.data, _self.exp, val => {
             _self.el.innerHTML = val
         })
         return _self
+    }
+    proxyKeys(key) {
+        var self = this;
+        Object.defineProperty(this, key, {
+            enumerable: false,
+            configurable: true,
+            get: function proxyGetter() {
+                return self.data[key];
+            },
+            set: function proxySetter(newVal) {
+                self.data[key] = newVal;
+            }
+        });
     }
 }
 
